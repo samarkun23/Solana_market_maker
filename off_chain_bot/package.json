@@ -1,0 +1,19 @@
+{
+  "name": "off_chain_bot",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.32.1",
+    "@orca-so/whirlpools-sdk": "^0.21.0",
+    "@raydium-io/raydium-sdk-v2": "^0.2.59-alpha",
+    "@solana/web3.js": "^1.98.4",
+    "axios": "^1.18.1"
+  }
+}

@@ -1,29 +1,29 @@
-import type { JUP_PriceResponse } from "../types/dexes";
 import axios from "axios";
 import { Raydium } from "@raydium-io/raydium-sdk-v2";
-import { Connection, PublicKey } from "@solana/web3.js";
-
-export async function getJUPPrice(): Promise<JUP_PriceResponse> {
-    const response = await axios.get<JUP_PriceResponse>(
-        "https://api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112"
-    )
-
-    return response.data;
-}
+import { Connection, PublicKey, Keypair } from "@solana/web3.js";
+import { CpAmm } from "@meteora-ag/cp-amm-sdk";
+import { normalizeMeteoraPool, normalizeOrcaPool, normalizeRadiumPool } from "../normalizers/normalizer";
 
 const connection = new Connection("https://api.mainnet-beta.solana.com");
 
-export async function getPoolRadium() {
+export async function getPoolMeteora() {
+    const response = await axios.get(
+                "https://damm-v2.datapi.meteora.ag/pools?page=1&page_size=100"
+    )
+    return response.data.data;
+}
+
+export async function getPoolRaydium() {
     const raydium = await Raydium.load({
         connection,
-        owner: new PublicKey("11111111111111111111111111111111")
+        owner: Keypair.generate().publicKey
     })
     const data = await raydium.api.fetchPoolByMints({ // getting here sol and usdc 
         mint1: "So11111111111111111111111111111111111111112",
         mint2: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     })
 
-    return data;
+    return data.data;
 }
 
 export async function getPoolOrca() {
@@ -36,4 +36,32 @@ export async function getPoolOrca() {
         pool.tokenMintB === SOL
     );
     return solPools;
+}
+
+export async function getAllPools() {
+    const results = await Promise.allSettled([
+        getPoolMeteora(),
+        getPoolRaydium(),
+        getPoolOrca()
+    ]);
+
+
+    const meteoraPools = results[0].status === "fulfilled"
+        ? results[0].value
+        : [];
+
+    const raydiumPools = results[1].status === "fulfilled"
+        ? results[1].value
+        : [];
+
+    const orcaPools = results[2].status === "fulfilled"
+        ? results[2].value
+        : [];
+
+
+    return [
+        ...meteoraPools.map(normalizeMeteoraPool),
+        ...raydiumPools.map(normalizeRadiumPool),
+        ...orcaPools.map(normalizeOrcaPool)
+    ];
 }

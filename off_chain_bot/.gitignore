@@ -8,3 +8,8 @@ test-ledger
 .env
 src/index.ts
 src/main.ts
+./dist
+.dist
+dist
+README.md
+./README.md

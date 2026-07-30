@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/main.ts","./src/examples/monitor-example.ts","./src/model/position.ts","./src/normalizers/normalizer.ts","./src/services/pool-monitor.ts","./src/services/position_storage.ts","./src/services/price-feeder.ts","./src/types/dexes.ts"],"errors":true,"version":"5.9.3"}

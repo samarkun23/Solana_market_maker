@@ -3,8 +3,17 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "tsx src/examples/monitor-example.ts",
+    "build": "tsc",
+    "start": "node dist/examples/monitor-example.js",
+    "monitor": "tsx src/examples/monitor-example.ts --watch"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/node": "^26.1.2",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2"
   },
   "peerDependencies": {
     "typescript": "^5"

@@ -1,4 +1,4 @@
-import type { PoolData } from "../types/dexes";
+import type { PoolData } from "../types/dexes.js";
 
 export function normalizeOrcaPool(pool:any): PoolData {
     return{

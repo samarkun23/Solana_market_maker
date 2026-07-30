@@ -16,7 +16,7 @@ export interface PositionSnapshot {
     tokenAAmount: bigint;
     tokenBAmount: bigint;
 
-    enteryValueUSD: number;
+    entryValueUSD: number;
 
     lowerTick: number;
     upperTick: number;

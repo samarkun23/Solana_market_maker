@@ -1,9 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import type { PositionSnapshot } from '../model/position';
+import type { PositionSnapshot } from '../model/position.js';
 import { utf8 } from '@raydium-io/raydium-sdk-v2';
-import type { v } from '@raydium-io/raydium-sdk-v2/lib/api-97e39847';
 
 export class PositionStorageManager {
     private snapshotDir: string;
@@ -31,8 +30,9 @@ export class PositionStorageManager {
         }
 
         // save to file TODO: we need this to save in db i just don't setup the db yet so i am making a todo for it i will revisit it .
+        const snapshortForStorage = this.bigIntToString(fullSnapshort);
         const filePath = path.join(this.snapshotDir, `${positionId}.json`);
-        fs.writeFileSync(filePath, JSON.stringify(fullSnapshort, null, 2));
+        fs.writeFileSync(filePath, JSON.stringify(snapshortForStorage, null, 2));
 
         // add to history index 
         await this.addToHistory({ // TODO: Need to make this function
@@ -54,7 +54,8 @@ export class PositionStorageManager {
             if (!fs.existsSync(filePath)) return null;
 
             const data = fs.readFileSync(filePath, 'utf8');
-            const snapshot = JSON.parse(data) as PositionSnapshot;
+
+            const snapshot = this.stringToBigInt(JSON.parse(data));
 
             return snapshot.status === "ACTIVE" ? snapshot : null;
 
@@ -251,6 +252,69 @@ export class PositionStorageManager {
             console.error(`Error adding to history:`, error)
         }
 
+    }
+
+    private bigIntToString(obj: any): any {
+        if (typeof obj !== "object" || obj === null) {
+            return obj;
+        }
+
+        if (typeof obj === "bigint") {
+            return obj.toString();
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map((item) => this.bigIntToString(item));
+        }
+
+        const result: any = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+                if (typeof value === "bigint") {
+                    result[key] = value.toString();
+                } else if (typeof value === "object" && value !== null) {
+                    result[key] = this.bigIntToString(value);
+                } else {
+                    result[key] = value;
+                }
+            }
+        }
+        return result;
+    }
+
+    private stringToBigInt(obj: any): any {
+        if (typeof obj !== "object" || obj === null) {
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map((item) => this.stringToBigInt(item));
+        }
+
+        const result: any = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const value = obj[key];
+
+                // These fields are BigInt fields
+                if (
+                    key === "tokenAAmount" ||
+                    key === "tokenBAmount" ||
+                    key === "liquidity" ||
+                    key === "feeGrowthInsideA" ||
+                    key === "feeGrowthInsideB"
+                ) {
+                    result[key] =
+                        typeof value === "string" ? BigInt(value) : BigInt(value);
+                } else if (typeof value === "object" && value !== null) {
+                    result[key] = this.stringToBigInt(value);
+                } else {
+                    result[key] = value;
+                }
+            }
+        }
+        return result;
     }
 
 }

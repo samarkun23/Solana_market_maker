@@ -2,7 +2,7 @@ import axios from "axios";
 import { Raydium } from "@raydium-io/raydium-sdk-v2";
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { CpAmm } from "@meteora-ag/cp-amm-sdk";
-import { normalizeMeteoraPool, normalizeOrcaPool, normalizeRadiumPool } from "../normalizers/normalizer";
+import { normalizeMeteoraPool, normalizeOrcaPool, normalizeRadiumPool } from "../normalizers/normalizer.js";
 
 const connection = new Connection("https://api.mainnet-beta.solana.com");
 
